@@ -36,17 +36,15 @@ resource "helm_release" "karpenter" {
   }
 }
 
-# NodeTemplate & Provisioner CRDs
-resource "kubectl_manifest" "karpenter_template" {
+# EC2NodeClass & NodePool CRDs for Karpenter v0.16+
+resource "kubectl_manifest" "karpenter_ec2nodeclass" {
   depends_on = [helm_release.karpenter]
-  yaml_body = templatefile("${path.module}/karpenter-node-template.yaml", {
+  yaml_body = templatefile("${path.module}/karpenter-ec2nodeclass.yaml", {
     cluster_name = module.eks.cluster_name
-    subnet_tags  = { "karpenter.sh/discovery" = var.cluster_name }
-    sg_tags      = { "karpenter.sh/discovery" = var.cluster_name }
   })
 }
 
-resource "kubectl_manifest" "karpenter_provisioner" {
-  depends_on = [helm_release.karpenter]
-  yaml_body  = file("${path.module}/karpenter-provisioner.yaml")
+resource "kubectl_manifest" "karpenter_nodepool" {
+  depends_on = [helm_release.karpenter, kubectl_manifest.karpenter_ec2nodeclass]
+  yaml_body  = file("${path.module}/karpenter-nodepool.yaml")
 }
