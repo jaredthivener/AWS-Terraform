@@ -1,0 +1,44 @@
+# Terraform files
+*.tfstate
+*.tfstate.*
+.crash
+.terraform/
+.terraform.lock.hcl
+*.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Local .terraformrc and .terraform.d directories
+.terraformrc
+.terraform.d/
+
+# Sensitive files
+*.pem
+*.key
+*.env
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Python virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Node modules
+node_modules/
+
+# Backup files
+*.bak
+*.swp
+*.swo
+
+# AWS credentials
+.aws/

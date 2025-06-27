@@ -1,0 +1,52 @@
+# IAM Role for Karpenter via EKS module
+module "karpenter" {
+  source                 = "terraform-aws-modules/eks/aws//modules/karpenter"
+  cluster_name           = module.eks.cluster_name
+  enable_irsa            = true
+  namespace              = "karpenter"
+  irsa_oidc_provider_arn = module.eks.oidc_provider_arn
+}
+
+# Karpenter Helm install
+# Uses default providers from providers.tf
+
+resource "helm_release" "karpenter" {
+  name             = "karpenter"
+  repository       = "https://charts.karpenter.sh"
+  chart            = "karpenter"
+  version          = "0.16.3"
+  namespace        = "karpenter"
+  create_namespace = true
+
+  set {
+    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = module.karpenter.iam_role_arn
+  }
+  set {
+    name  = "clusterName"
+    value = module.eks.cluster_name
+  }
+  set {
+    name  = "clusterEndpoint"
+    value = module.eks.cluster_endpoint
+  }
+  set {
+    name  = "settings.aws.defaultInstanceProfile"
+    value = module.karpenter.node_iam_role_name
+  }
+}
+
+# NodeTemplate & Provisioner CRDs
+resource "kubectl_manifest" "karpenter_template" {
+  depends_on = [helm_release.karpenter]
+  yaml_body = templatefile("${path.module}/karpenter-node-template.yaml", {
+    cluster_name = module.eks.cluster_name
+    subnet_tags  = { "karpenter.sh/discovery" = var.cluster_name }
+    sg_tags      = { "karpenter.sh/discovery" = var.cluster_name }
+  })
+}
+
+resource "kubectl_manifest" "karpenter_provisioner" {
+  depends_on = [helm_release.karpenter]
+  yaml_body  = file("${path.module}/karpenter-provisioner.yaml")
+}
