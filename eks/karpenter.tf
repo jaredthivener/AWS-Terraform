@@ -14,7 +14,7 @@ resource "helm_release" "karpenter" {
   name             = "karpenter"
   repository       = "https://charts.karpenter.sh"
   chart            = "karpenter"
-  version          = "0.16.3"
+  version          = "1.5.0"
   namespace        = "karpenter"
   create_namespace = true
 
