@@ -6,7 +6,7 @@ A comprehensive Terraform configuration for deploying production-ready AWS infra
 
 This repository contains two main infrastructure components:
 
-- **EKS Cluster** - Production-ready Kubernetes cluster with Karpenter autoscaling
+- **EKS Cluster** - FreeTier-ready Kubernetes cluster with Karpenter autoscaling
 - **RDS Clusters** - Multi-database Aurora clusters with encryption and high availability
 
 ## 📁 Repository Structure
