@@ -36,7 +36,7 @@ resource "helm_release" "karpenter" {
   }
 }
 
-# EC2NodeClass & NodePool CRDs for Karpenter v0.16+
+# EC2NodeClass & NodePool CRDs for Karpenter v1.5.1
 resource "kubectl_manifest" "karpenter_ec2nodeclass" {
   depends_on = [helm_release.karpenter]
   yaml_body = templatefile("${path.module}/karpenter-ec2nodeclass.yaml", {
