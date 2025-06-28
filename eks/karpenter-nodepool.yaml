@@ -9,39 +9,40 @@ spec:
       labels:
         provisioner: "karpenter-default"
         node-type: "karpenter-managed"
+        tier: "free"
     
     spec:
-      # Instance requirements
+      # Instance requirements - optimized for free tier
       requirements:
         - key: karpenter.sh/capacity-type
           operator: In
-          values: ["spot", "on-demand"]
+          values: ["spot"] # Prefer spot for cost savings on free tier
         - key: kubernetes.io/arch
           operator: In
           values: ["amd64"]
         - key: node.kubernetes.io/instance-type
           operator: In
-          values: ["t3.micro", "t3.small", "t3.medium"]
+          values: ["t3.micro", "t3.nano", "t2.micro"] # Free tier eligible instances
       
       # Reference to the EC2NodeClass
       nodeClassRef:
-        apiVersion: karpenter.k8s.aws/v1beta1
+        apiVersion: karpenter.k8s.aws/v1
         kind: EC2NodeClass
         name: default
       
       # Taints for nodes (optional)
       taints: []
   
-  # Limits on the total number of resources this NodePool can create
+  # Limits on the total number of resources this NodePool can create - free tier limits
   limits:
-    cpu: 1000
-    memory: 1000Gi
+    cpu: 100 # Reduced for free tier
+    memory: 100Gi # Reduced for free tier
   
-  # Disruption settings
+  # Disruption settings - optimized for cost and free tier
   disruption:
     # Consolidation settings
     consolidationPolicy: WhenUnderutilized
-    consolidateAfter: 30s
+    consolidateAfter: 15s # Faster consolidation for cost savings
     
-    # Node termination grace period
-    expireAfter: 720h # 30 days
+    # Node termination grace period - shorter for free tier
+    expireAfter: 168h # 7 days

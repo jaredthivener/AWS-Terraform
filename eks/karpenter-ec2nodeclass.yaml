@@ -3,14 +3,14 @@ kind: EC2NodeClass
 metadata:
   name: default
 spec:
-  # Instance family and size requirements
+  # Instance family and size requirements optimized for free tier
   instanceStorePolicy: "NVME"
   
-  # Root volume
+  # Root volume - smaller for cost optimization
   blockDeviceMappings:
     - deviceName: /dev/xvda
       ebs:
-        volumeSize: 20Gi
+        volumeSize: 8Gi
         volumeType: gp3
         deleteOnTermination: true
   
@@ -36,8 +36,9 @@ spec:
     #!/bin/bash
     /etc/eks/bootstrap.sh ${cluster_name}
   
-  # Tags for instances
+  # Tags for instances - optimized for free tier
   tags:
     Name: "karpenter-${cluster_name}"
     Environment: "development"
     ManagedBy: "karpenter"
+    Tier: "free"
