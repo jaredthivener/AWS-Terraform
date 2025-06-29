@@ -52,3 +52,13 @@ output "kubectl_config_command" {
   description = "Command to configure kubectl"
   value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${module.eks.cluster_name}"
 }
+
+output "aws_load_balancer_controller_role_arn" {
+  description = "ARN of IAM role for AWS Load Balancer Controller"
+  value       = module.aws_load_balancer_controller_irsa_role.iam_role_arn
+}
+
+output "aws_account_id" {
+  description = "AWS Account ID being used"
+  value       = local.aws_account_id
+}

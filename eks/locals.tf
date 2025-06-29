@@ -1,4 +1,7 @@
 locals {
+  # AWS Account ID handling
+  aws_account_id = var.aws_account_id != null ? var.aws_account_id : data.aws_caller_identity.current.account_id
+
   # Common tags applied to all resources
   common_tags = {
     Project     = "eks-free-tier"

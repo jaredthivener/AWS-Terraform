@@ -10,13 +10,13 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
-  
+
   # Remove hardcoded role ARN - use environment variables or AWS CLI profile instead
   # assume_role {
   #   role_arn     = "arn:aws:iam::222928549187:role/AdminAssumeRole"
   #   session_name = "TerraformSession"
   # }
-  
+
   default_tags {
     tags = {
       Project     = "eks-free-tier"

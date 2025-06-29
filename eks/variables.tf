@@ -6,6 +6,12 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "aws_account_id" {
+  description = "AWS Account ID for IAM role ARNs (will auto-detect if not provided)"
+  type        = string
+  default     = null
+}
+
 variable "owner_name" {
   description = "Owner or responsible person for this environment. Used for tagging."
   type        = string

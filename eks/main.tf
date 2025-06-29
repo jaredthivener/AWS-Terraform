@@ -1,3 +1,6 @@
+# Data sources
+data "aws_caller_identity" "current" {}
+
 module "vpc" {
   source               = "terraform-aws-modules/vpc/aws"
   version              = "~> 5.0"
@@ -22,10 +25,12 @@ module "vpc" {
     "karpenter.sh/discovery" = var.cluster_name
   }
   private_subnet_tags = {
-    "karpenter.sh/discovery" = var.cluster_name
+    "karpenter.sh/discovery"          = var.cluster_name
+    "kubernetes.io/role/internal-elb" = "1"
   }
   public_subnet_tags = {
     "karpenter.sh/discovery" = var.cluster_name
+    "kubernetes.io/role/elb" = "1"
   }
   # Outbound connectivity for private subnets (NAT Gateway, Free Tier: single NAT)
   enable_nat_gateway      = true
@@ -37,7 +42,7 @@ module "eks" {
   source                                   = "terraform-aws-modules/eks/aws"
   version                                  = "20.37.1"
   cluster_name                             = var.cluster_name
-  cluster_version                          = "1.31"
+  cluster_version                          = "1.33"
   vpc_id                                   = module.vpc.vpc_id
   subnet_ids                               = module.vpc.private_subnets
   cluster_endpoint_public_access           = true
@@ -47,12 +52,37 @@ module "eks" {
     kube-proxy             = {}
     vpc-cni                = {}
     eks-pod-identity-agent = {}
+    coredns                = {}
+    aws-ebs-csi-driver     = {}
   }
 
-  fargate_profiles = {
-    example = {
-      name      = "example"
-      selectors = [{ namespace = "default" }]
+  # Enable IRSA for service accounts
+  enable_irsa = true
+
+  # EKS Managed Node Groups for initial workloads
+  eks_managed_node_groups = {
+    initial = {
+      name           = "initial-node-group"
+      instance_types = ["t3.small"]
+
+      min_size     = 1
+      max_size     = 3
+      desired_size = 2
+
+      # Use private subnets for security
+      subnet_ids = module.vpc.private_subnets
+
+      labels = {
+        Environment = "dev"
+        NodeType    = "initial"
+      }
+
+      taints = []
+
+      tags = {
+        Environment = "dev"
+        NodeType    = "initial"
+      }
     }
   }
 

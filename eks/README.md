@@ -4,18 +4,20 @@ This Terraform configuration creates a cost-optimized EKS cluster with Karpenter
 
 ## Architecture
 
-- **EKS Cluster**: Running on AWS Free Tier with Fargate profiles
-- **Karpenter**: Latest v1beta1 API for efficient node provisioning
-- **VPC**: Multi-AZ setup with public/private subnets
+- **EKS Cluster**: Running on AWS Free Tier with managed node groups and Karpenter autoscaling
+- **Karpenter**: Latest v1.5.1 for efficient node provisioning and cost optimization
+- **AWS Load Balancer Controller**: Proper Helm installation with IRSA for ingress management
+- **VPC**: Multi-AZ setup with public/private subnets and proper tagging for ALB
 - **Security**: Encrypted EBS volumes, secure instance metadata, minimal IAM permissions
 
 ## Features
 
 - ✅ **Cost Optimized**: Single NAT Gateway, spot instances, resource limits
-- ✅ **Latest APIs**: Karpenter v1beta1 (EC2NodeClass + NodePool)
+- ✅ **Latest APIs**: Karpenter v1.5.1 (EC2NodeClass + NodePool), EKS 1.31
+- ✅ **Load Balancing**: AWS Load Balancer Controller with proper IRSA setup
 - ✅ **Security**: Encrypted storage, secure metadata, proper RBAC
 - ✅ **Monitoring**: CloudWatch logs (optional), comprehensive outputs
-- ✅ **Free Tier**: Designed for t3.micro/small instances
+- ✅ **Free Tier**: Designed for t3.micro/small instances with managed node groups
 
 ## Prerequisites
 
@@ -69,6 +71,14 @@ This Terraform configuration creates a cost-optimized EKS cluster with Karpenter
 - **Resource Limits**: CPU and memory caps
 - **Free Tier Instances**: t3.micro/small focus
 - **Minimal Logging**: Disabled by default
+
+## Recent Improvements
+
+- ✅ **Updated to AWS Load Balancer Controller v2.13.3**: Latest version with security updates
+- ✅ **Proper IRSA Configuration**: Service account managed externally with correct permissions
+- ✅ **Resource Limits**: CPU and memory limits configured for better resource management
+- ✅ **Target Type Optimization**: Set to `ip` for better performance with VPC CNI
+- ✅ **Integrated CRDs Management**: CRDs installed automatically via Terraform (no manual steps)
 
 ## Usage Examples
 
